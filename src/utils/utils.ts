@@ -1,3 +1,9 @@
+import { render as renderStencil } from '@wdio/browser-runner/stencil'
+import { $, expect } from '@wdio/globals'
+
+// @ts-expect-error
+import diffable from 'https://esm.sh/diffable-html@5.0.0'
+
 const getShadowDomHtml = (shadowRoot: ShadowRoot) => {
     let shadowHTML = '';
     for (const el of shadowRoot.childNodes) {
@@ -40,4 +46,27 @@ export function injectScript (script: string) {
     const scriptEl = document.createElement('script')
     scriptEl.innerHTML = script
     document.body.appendChild(scriptEl)
+}
+
+export async function render (args: any) {
+    const component = await renderStencil(args)
+
+    /**
+     * verify we have no shadow elements
+     */
+    if (process.env.REMOVE_SHADOW_PROP) {
+        expect([...document.querySelector('stencil-stage')!.querySelectorAll('*')].filter(el => el.shadowRoot).length).toBe(0)
+    }
+
+    return component
+}
+
+export async function getDiffableHTML (): Promise<string> {
+    /**
+     * make shadow roots diffable
+     */
+    if (!process.env.REMOVE_SHADOW_PROP) {
+        transform()
+    }
+    return diffable(await $('stencil-stage').getHTML(false))
 }

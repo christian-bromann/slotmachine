@@ -32,6 +32,11 @@ export const config: Options.Testrunner = {
             transpileOnly: true
         }
     },
+
+    suites: {
+        1968: ['./src/components/1968/*.test.tsx'],
+        2997: ['./src/components/2997/*.test.tsx'],
+    },
     
     //
     // ==================
